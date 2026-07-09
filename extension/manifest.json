@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Catify Web - Random Cat Image Replacer",
+  "version": "1.0",
+  "description": "Replaces all images on any webpage with cute, random cat images fetched from The Cat API.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
