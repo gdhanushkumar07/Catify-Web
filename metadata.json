@@ -1,6 +1,0 @@
-{
-  "name": "Catify Web - Chrome Extension Builder",
-  "description": "An interactive playground, builder, and developer guide for a Chrome extension that replaces webpage images with cute random cat images.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
