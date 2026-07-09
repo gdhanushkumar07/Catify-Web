@@ -6,15 +6,3 @@ coverage/
 *.log
 .env*
 !.env.example
-
-# React Web App files (ignored because only the extension folder is pushed to GitHub)
-index.html
-metadata.json
-package.json
-package-lock.json
-tsconfig.json
-vite.config.ts
-src/
-assets/
-*.zip
-catify-extension/
