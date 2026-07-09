@@ -16,3 +16,5 @@ tsconfig.json
 vite.config.ts
 src/
 assets/
+*.zip
+catify-extension/

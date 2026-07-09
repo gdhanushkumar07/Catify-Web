@@ -1,7 +1,6 @@
 // content.js - Catify Web Image Replacer
 let isActive = true;
 let catImagesPool = [];
-const API_URL = 'https://api.thecatapi.com/v1/images/search?limit=25';
 
 // Load initial state from Chrome storage
 chrome.storage.local.get(['isActive', 'replacedCount'], (result) => {
@@ -24,29 +23,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Fetch a batch of cat images to populate our replacement pool
-async function fetchCatImages() {
-  try {
-    const response = await fetch(API_URL);
-    if (response.ok) {
-      const data = await response.json();
-      return data.map(item => item.url);
-    }
-  } catch (error) {
-    console.error('[Catify Web] Error fetching cat images:', error);
-  }
-  
-  // High-quality backup cat images from Unsplash in case of rate limit or network issues
-  return [
-    'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1533743983669-94fa5c4338ec?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1526336028075-85586b9793a0?w=500&auto=format&fit=crop&q=80'
-  ];
+// Fetch a batch of cat images to populate our replacement pool via Background Worker (CSP Bypass)
+function fetchCatImages() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ action: 'fetchCats' }, (response) => {
+      if (response && response.success && response.urls && response.urls.length > 0) {
+        resolve(response.urls);
+      } else {
+        console.log('[Catify Web] Service worker fetch failed or CSP-blocked, using local high-quality backups.');
+        resolve([
+          'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1533743983669-94fa5c4338ec?w=500&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1526336028075-85586b9793a0?w=500&auto=format&fit=crop&q=80'
+        ]);
+      }
+    });
+  });
 }
 
 // Initialize the replacement process
